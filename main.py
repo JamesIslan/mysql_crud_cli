@@ -1,7 +1,6 @@
 from crudfuncs import *
 from os import getenv
 from dotenv import load_dotenv
-from os import system
 from pprint import pprint
 
 
@@ -79,11 +78,11 @@ def main() -> None:
                         continue
                     break
                 # Campo Alterado
-                update_field = lambda: input('Campo a ser alterado: ')  # Desconsidere
+                update_field = lambda: input('Campo a ser alterado: ')
                 table_fields = db.get_fields('cliente')
                 update_options = get_attr_options(table_fields)
                 print('Que campo você deseja alterar?: ')
-                show_attr_options(update_options)  # 1 - nome; 2 - email; 3 - sexo; 4 - telefone
+                show_attr_options(update_options)
                 while inner_option := update_field():
                     if inner_option not in list(update_options.keys()):
                         print('O campo informado não existe!')
@@ -100,14 +99,6 @@ def main() -> None:
                 )
                 print('Alteração feita com sucesso!')
             case '3':
-                # Id Field Input
-                # id_field = lambda: input('Nome do Campo: ')
-                # while inner_field := id_field():
-                #     field_checking = db.check_field(table='cliente', field=inner_field)
-                #     if not field_checking:
-                #         print('O campo informado não existe!')
-                #         continue
-                #     break
                 registry_id = lambda: input('ID do atributo a ser removido: ')
                 while inner_id := registry_id():
                     attribute_checking = db.check_value(
@@ -122,15 +113,12 @@ def main() -> None:
                 db.delete('cliente', 'id_cliente', inner_id)
                 print('Registro removido!')
             case '4':
-                # Buscar todos os clientes
-                # Buscar clientes pelo nome
                 update_field = lambda: str(input(
                     'Campos a serem exibidos (separados por espaço): '
                 )).split()
                 table_fields = db.get_fields('cliente')
                 update_options = get_attr_options(table_fields)
                 available_options = list(update_options.keys())
-                # print('Que campo você deseja alterar?: ')
                 show_attr_options(update_options)  # 1 - nome; 2 - email; 3 - sexo; 4 - telefone
                 while inner_options := update_field():
                     check_list = [item in available_options for item in inner_options]
@@ -172,9 +160,7 @@ def main() -> None:
                 db.close()
                 exit()
             case _:
-                # system("cls")
                 print('Opção Inválida!')
-                # db.close()
                 continue
 
 
