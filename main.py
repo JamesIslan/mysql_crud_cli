@@ -4,24 +4,28 @@ from dotenv import load_dotenv
 from os import system
 from pprint import pprint
 
-def show_options():
-    print(f'1 - Inserir Usuário')
-    print(f'2 - Editar Usuário')
-    print(f'3 - Remover Usuário')
-    print(f'4 - Buscar Usuário')
+
+def show_options() -> None:
+    print(f'1 - Inserir Registro')
+    print(f'2 - Editar Registro')
+    print(f'3 - Remover Registro')
+    print(f'4 - Buscar Registro')
     print(f'0 - Encerrar Programa')
     return None
 
-def get_attr_options(attr: tuple | list):
+
+def get_attr_options(attr: tuple | list) -> dict:
     int_enum = enumerate(attr, 1)
     str_enum = [(str(i[0]), i[1]) for i in int_enum]
     return dict(str_enum)
 
-def show_attr_options(options: dict):
+
+def show_attr_options(options: dict) -> None:
     for k, v in options.items():
         print(f'{k} – {v}')
 
-def display_db_response(raw_response: tuple | list):
+
+def display_db_response(raw_response: tuple | list) -> None:
     for row in raw_response:
         pprint(row, width=100)
         # print((" "*10).join(row))
@@ -39,20 +43,35 @@ def main() -> None:
         desired_option = input('Opção Desejada: ')
         match desired_option:
             case '1':
+                desired_table = lambda: input('Nome da Tabela: ')
+                while inner_table := desired_table():
+                    if not db.check_table(inner_table):
+                        print('Esta tabela não existe!')
+                        continue
+                    break
+                raw_table_fields = db.get_fields(inner_table)
+                display_table_fields = [i.capitalize() for i in raw_table_fields]
                 data = lambda: input(
-                    'Nome, Email, Sexo, Telefone (separado por espaços): '
-                    ).split()
-                while len(inner := data()) != 4:
-                    print('Há parâmetros faltando!')
-                    continue
-                db.insert('cliente', inner)
+                    f'{(", ").join(display_table_fields)} (separado por espaços): '
+                ).split()
+
+                while inner_data := data():
+                    if len(inner_data) < len(raw_table_fields):
+                        print('Há parâmetros faltando!')
+                        continue
+                    elif len(inner_data) > len(raw_table_fields):
+                        print('Há parâmetros a mais!')
+                        continue
+                    break
+                db.create(inner_table, raw_table_fields, inner_data)
+
             case '2':
                 # Checagem ID
                 registry_id = lambda: input('ID a ser alterado: ')
                 while inner_id := registry_id():
                     attribute_checking = db.check_value(
                         table='cliente',
-                        attribute='id_cliente',
+                        field='id_cliente',
                         value=inner_id
                     )
                     if not attribute_checking:
@@ -60,11 +79,11 @@ def main() -> None:
                         continue
                     break
                 # Campo Alterado
-                update_field = lambda: input('Campo a ser alterado: ') # Desconsidere
+                update_field = lambda: input('Campo a ser alterado: ')  # Desconsidere
                 table_fields = db.get_fields('cliente')
                 update_options = get_attr_options(table_fields)
                 print('Que campo você deseja alterar?: ')
-                show_attr_options(update_options) # 1 - nome; 2 - email; 3 - sexo; 4 - telefone
+                show_attr_options(update_options)  # 1 - nome; 2 - email; 3 - sexo; 4 - telefone
                 while inner_option := update_field():
                     if inner_option not in list(update_options.keys()):
                         print('O campo informado não existe!')
@@ -72,7 +91,7 @@ def main() -> None:
                     break
                 inner_field = update_options[inner_option]
                 new_reg_value = input(f'Novo valor para o campo {inner_field}: ')
-                db.update_value(
+                db.update(
                     table='cliente',
                     attribute=inner_field,
                     newvalue=new_reg_value,
@@ -93,7 +112,7 @@ def main() -> None:
                 while inner_id := registry_id():
                     attribute_checking = db.check_value(
                         table='cliente',
-                        attribute='id_cliente',
+                        field='id_cliente',
                         value=inner_id
                     )
                     if not attribute_checking:
@@ -107,12 +126,12 @@ def main() -> None:
                 # Buscar clientes pelo nome
                 update_field = lambda: str(input(
                     'Campos a serem exibidos (separados por espaço): '
-                    )).split()
+                )).split()
                 table_fields = db.get_fields('cliente')
                 update_options = get_attr_options(table_fields)
                 available_options = list(update_options.keys())
                 # print('Que campo você deseja alterar?: ')
-                show_attr_options(update_options) # 1 - nome; 2 - email; 3 - sexo; 4 - telefone
+                show_attr_options(update_options)  # 1 - nome; 2 - email; 3 - sexo; 4 - telefone
                 while inner_options := update_field():
                     check_list = [item in available_options for item in inner_options]
                     if not all(check_list):
@@ -124,12 +143,12 @@ def main() -> None:
                 # Input nome usuario
                 input_where = lambda: input(
                     'Nome do cliente (em branco para pesquisar todos): '
-                    )
+                )
                 while inner := input_where():
                     if inner:
                         validation = db.check_value(
                             table='cliente',
-                            attribute='nome',
+                            field='nome',
                             value=inner
                         )
                         if validation:
@@ -148,10 +167,6 @@ def main() -> None:
                     where=None
                 )
                 display_db_response(result)
-            case '5':
-                attrs = db.get_fields('cliente')
-                fields = get_attr_options(attrs)
-                print(fields)
             case '0':
                 print('Saindo do programa!')
                 db.close()
