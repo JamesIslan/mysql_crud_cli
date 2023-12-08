@@ -24,10 +24,12 @@ class DataBase():
         self.__connection.commit()
         print('Insert realizado!')
 
-    def read(self, fields: str | None = None, table: str | None = 'cliente', where: str | None = None) -> list:
+    def read(self, fields: str | None, table: str | None = 'cliente', where_field: str | None = '', where_value: str | None = '') -> list:
+        if fields == '':
+            fields = '*'
         query = f'SELECT {fields} FROM {table} '
-        if where is not None:
-            query += f'WHERE nome like "%{where}%"'
+        if where_field:
+            query += f'WHERE {where_field} like "%{where_value}%"'
         self.__cursor.execute(query)
         response = self.__cursor.fetchall()
         return response
@@ -57,7 +59,6 @@ class DataBase():
 
     def check_field(self, table: str, field: str) -> bool:
         table_fields = self.get_fields(table)
-        print(table_fields)
         return field in table_fields
 
     def check_value(self, table: str, field: str, value: str) -> bool:
@@ -71,8 +72,8 @@ class DataBase():
             query = f'SELECT * FROM {table} WHERE {field} {operator} {value_check}'
             self.__cursor.execute(query)
             return bool(self.__cursor.fetchone())
-        except Exception as e:
-            raise e
+        except connector.errors.ProgrammingError:
+            return False
 
     def get_fields(self, table: str, PK: bool = False) -> list:
 
@@ -84,6 +85,13 @@ class DataBase():
         else:
             table_fields = [elem[0] for elem in response if not 'PRI' in elem]
         return table_fields
+
+    def get_pk_field(self, table: str) -> str:
+        query = f'DESCRIBE {table}'
+        self.__cursor.execute(query)
+        response = self.__cursor.fetchall()
+        pk_field = [i[0] for i in response if i[3] == 'PRI'][0]
+        return str(pk_field)
 
     def close(self) -> None:
         self.__connection.close()

@@ -25,9 +25,12 @@ def show_attr_options(options: dict) -> None:
 
 
 def display_db_response(raw_response: tuple | list) -> None:
-    for row in raw_response:
-        pprint(row, width=100)
-        # print((" "*10).join(row))
+    if raw_response:
+        for row in raw_response:
+            pprint(row, width=100)
+            # print((" "*10).join(row))
+    else:
+        print('Sua consulta não retornou valores!')
 
 
 def main() -> None:
@@ -65,12 +68,20 @@ def main() -> None:
                 db.create(inner_table, raw_table_fields, inner_data)
 
             case '2':
+                # Checagem tabela
+                desired_table = lambda: input('Tabela a ser alterada: ')
+                while inner_table := desired_table():
+                    if not db.check_table(inner_table):
+                        print('Esta tabela não existe!')
+                        continue
+                    break
+                table_pk_field = db.get_pk_field(inner_table)
                 # Checagem ID
                 registry_id = lambda: input('ID a ser alterado: ')
                 while inner_id := registry_id():
                     attribute_checking = db.check_value(
-                        table='cliente',
-                        field='id_cliente',
+                        table=inner_table,
+                        field=table_pk_field,
                         value=inner_id
                     )
                     if not attribute_checking:
@@ -79,7 +90,7 @@ def main() -> None:
                     break
                 # Campo Alterado
                 update_field = lambda: input('Campo a ser alterado: ')
-                table_fields = db.get_fields('cliente')
+                table_fields = db.get_fields(inner_table)
                 update_options = get_attr_options(table_fields)
                 print('Que campo você deseja alterar?: ')
                 show_attr_options(update_options)
@@ -91,35 +102,49 @@ def main() -> None:
                 inner_field = update_options[inner_option]
                 new_reg_value = input(f'Novo valor para o campo {inner_field}: ')
                 db.update(
-                    table='cliente',
+                    table=inner_table,
                     attribute=inner_field,
                     newvalue=new_reg_value,
-                    id_field='id_cliente',
+                    id_field=table_pk_field,
                     id_value=inner_id
                 )
                 print('Alteração feita com sucesso!')
             case '3':
-                registry_id = lambda: input('ID do atributo a ser removido: ')
+                desired_table = lambda: input('Tabela do registro a ser removido: ')
+                while inner_table := desired_table():
+                    if not db.check_table(inner_table):
+                        print('Esta tabela não existe!')
+                        continue
+                    break
+                table_pk_field = db.get_pk_field(inner_table)
+                registry_id = lambda: input('ID do registro a ser removido: ')
                 while inner_id := registry_id():
                     attribute_checking = db.check_value(
-                        table='cliente',
-                        field='id_cliente',
+                        table=inner_table,
+                        field=table_pk_field,
                         value=inner_id
                     )
                     if not attribute_checking:
                         print('O ID informado não existe!')
                         continue
                     break
-                db.delete('cliente', 'id_cliente', inner_id)
+                db.delete(table=inner_table, pk_field=table_pk_field, pk_value=inner_id)
                 print('Registro removido!')
             case '4':
+                desired_table = lambda: input('Tabela a ser consultada: ')
+                while inner_table := desired_table():
+                    if not db.check_table(inner_table):
+                        print('Esta tabela não existe!')
+                        continue
+                    break
                 update_field = lambda: str(input(
-                    'Campos a serem exibidos (separados por espaço): '
+                    'Campos a serem exibidos (separados por espaço) '
+                    '[em branco para todos]: '
                 )).split()
-                table_fields = db.get_fields('cliente')
+                table_fields = db.get_fields(inner_table)
                 update_options = get_attr_options(table_fields)
                 available_options = list(update_options.keys())
-                show_attr_options(update_options)  # 1 - nome; 2 - email; 3 - sexo; 4 - telefone
+                show_attr_options(update_options)
                 while inner_options := update_field():
                     check_list = [item in available_options for item in inner_options]
                     if not all(check_list):
@@ -128,31 +153,32 @@ def main() -> None:
                     break
                 select_list = [update_options[i] for i in inner_options]
                 select_list = (', ').join(select_list)
-                # Input nome usuario
-                input_where = lambda: input(
-                    'Nome do cliente (em branco para pesquisar todos): '
+                input_where_field = lambda: input(
+                    'Campo para pesquisar (em branco para pular): '
                 )
-                while inner := input_where():
-                    if inner:
-                        validation = db.check_value(
-                            table='cliente',
-                            field='nome',
-                            value=inner
+                while inner_where_field := input_where_field():
+                    if inner_where_field:  # Usuário digitou campo
+                        field_checking = db.check_field(
+                            table=inner_table,
+                            field=inner_where_field
                         )
-                        if validation:
-                            print('Este nome existe na tabela!')
-                            result = db.read(
-                                fields=select_list,
-                                table='cliente',
-                                where=inner
-                            )
-                            display_db_response(result)
-                        else:
-                            print('Este nome não está contido na tabela!')
+                        if field_checking:  # Campo digitado existe
+                            break
+                        print('Este campo não existe!')
+                        continue
+                    break  # Usuário não digitou campo (mostrar todos)
+                if inner_where_field:
+                    # Pedir valor
+                    input_where_value = input(
+                        f'Valor de busca para o campo {inner_where_field}: '
+                    )
+                else:
+                    input_where_value = ''
                 result = db.read(
                     fields=select_list,
-                    table='cliente',
-                    where=None
+                    table=inner_table,
+                    where_field=inner_where_field,
+                    where_value=str(input_where_value)
                 )
                 display_db_response(result)
             case '0':
