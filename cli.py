@@ -1,4 +1,4 @@
-from crudfuncs import *
+from crud import *
 from os import getenv
 from dotenv import load_dotenv
 from pprint import pprint
