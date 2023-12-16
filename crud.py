@@ -1,7 +1,11 @@
 import mysql.connector as connector
+from os import getenv
 
 
 class DataBase:
+    table_name = str()
+    table_fields = list()
+
     @classmethod
     def connect(cls, host: str, user: str, password: str, db_name: str) -> None:
         cls.host = host
@@ -16,55 +20,62 @@ class DataBase:
         )
         cls.__cursor = cls.__connection.cursor(buffered=True)
 
-    """def __init__(self, host: str, user: str, password: str, db_name: str):
-        pass
-        self.host = host
-        self.user = user
-        self.password = password
-        self.db_name = db_name
-        self.__connection = connector.connect(
-            host=self.host,
-            user=self.user,
-            password=self.password,
-            database=self.db_name,
-        )
-        self.__cursor = self.__connection.cursor(buffered=True)"""
-
-    def create(self, table: str, fields: list, *args) -> None:
+    def create(self, *args) -> None:
+        fields = self.table_fields[1:]
+        if len(args) != len(fields):
+            raise Exception
         query = (
-            f'INSERT INTO {table}({(",").join(fields)}) '
+            f'INSERT INTO {self.table_name}({(", ").join(fields)}) '
             f'VALUES({", ".join(["%s"] * len(fields))})'
         )
-        DataBase.__cursor.execute(query, values)
-        DataBase.__connection.commit()
-        # print('Insert realizado!')
+        print(query)
+        self.__cursor.execute(query, args)
+        self.__connection.commit()
+        print('Deu tudo certo!')
 
-    def read(self, fields: str | None, table: str | None = 'cliente', where_field: str | None = '', where_value: str | None = '') -> list:
-        if fields == '':
-            fields = '*'
-        query = f'SELECT {fields} FROM {table} '
+    def read(
+        self,
+        fields: list | None = None,
+        where_field: str | None = None,
+        where_value: str | None = None
+    ) -> list:
+        if not fields:
+            fields = self.table_fields[1:]
+        query = f'SELECT {", ".join(fields)} FROM {self.table_name} '
         if where_field:
             query += f'WHERE {where_field} like "%{where_value}%"'
-        DataBase.__cursor.execute(query)
-        response = DataBase.__cursor.fetchall()
+        self.__cursor.execute(query)
+        response = self.__cursor.fetchall()
         return response
 
-    def update(self, table, attribute, newvalue, id_field, id_value) -> None:
+    def update(
+            self,
+            attribute,
+            newvalue,
+            pk_value) -> None:
+        pk_field = self.table_fields[0]
         query = (
-            f'UPDATE {table} '
-            f'SET {attribute} = %s '  # newvalue
-            f'WHERE {id_field} = %s '  # id_value
+            f'UPDATE {self.table_name} '
+            f'SET {attribute} = "{newvalue}" '  # newvalue
+            f'WHERE {pk_field} = "{pk_value}" '  # id_value
         )
-        DataBase.__cursor.execute(query, (newvalue, id_value))
-        DataBase.__connection.commit()
+        self.__cursor.execute(query)
+        self.__connection.commit()
+        print('Deu certo o update')
 
-    def delete(self, table: str, pk_field: str, pk_value: str) -> None:
-        query = f'DELETE FROM {table} WHERE {pk_field} = %s'
+    def delete(self, pk_value: str) -> None:
+        pk_field = self.table_fields[0]
+        query = (
+            f'DELETE FROM {self.table_name} '
+            f'WHERE {pk_field} = "{pk_value}"'
+        )
         try:
-            DataBase.__cursor.execute(query, (pk_value, ))
-            DataBase.__connection.commit()
+            self.__cursor.execute(query)
+            self.__connection.commit()
         except Exception as e:
             raise e
+        finally:
+            print('Deleção feita com sucesso!')
 
     def check_table(self, table: str) -> bool:
         query = f'SHOW TABLES LIKE "{table}"'
@@ -117,7 +128,7 @@ class TableCliente(DataBase):
     table_fields = ['id_cliente', 'nome', 'email', 'sexo', 'telefone']
 
     def __init__(self) -> None:
-        pass
+        super().__init__()
 
 
 class TableProduto(DataBase):
@@ -134,7 +145,3 @@ class TableUsuario(DataBase):
 
     def __init__(self) -> None:
         pass
-
-
-DataBase.connect('', '', '', '')
-tabelausuario = TableUsuario()
