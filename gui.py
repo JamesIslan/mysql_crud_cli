@@ -1,10 +1,5 @@
 from guizero import App, Text, TextBox, PushButton, Box, Picture, Window, ButtonGroup
-
-
-def block_window(app: App):
-    app.tk.attributes('-toolwindow', 1)
-    app.tk.resizable(False, False)
-
+from crud import DataBase
 
 def check_options():
     pass
@@ -36,24 +31,33 @@ def show_password():
 
 
 def submit():
-    if pwd_input.value.strip() == '' or email_input.value.strip() == '':
+    if pwd_input.value.strip() == '' or user_input.value.strip() == '':
         app.info("Inform", "Informe um valor de email e senha para de efetuar o login!")
-        pwd_input.value = email_input.value = ''
+        pwd_input.value = user_input.value = ''
     else:
-        if email_input.value == 'admin' and pwd_input.value == '123':
-            options = Window(app, width=400, height=400, layout='grid')
+        connect = DataBase('localhost', 'root', '123', 'aula_conexao_bd')
+        rows = connect.read(fields='usuario,senha',table='usuario')
+        data_input = (user_input.value, pwd_input.value)
+        connect.close()
+        if data_input in rows:
+            options = Window(app, width=400, height=400, layout='grid', bg='#EDE7DF',)
             options.tk.resizable(0, 0)
             ghost_box = Box(options, grid=[0, 0], width=65)
             button_add = PushButton(options, text="Adicionar", command=add, grid=[1, 0])
             button_edit = PushButton(options, text="Editar", command=edit, grid=[2, 0])
             button_search = PushButton(options, text="Buscar", command=search, grid=[3, 0])
             button_remove = PushButton(options, text="Excluir", command=remove, grid=[4, 0])
+            button_add.bg = button_edit.bg = button_remove.bg = button_search.bg ='white'
             app.hide()
             options.show()
+        else:
+            app.warn(title='Inform', text='Usuário e/ou senha inválidos')
+            pwd_input.value = user_input.value = ''
+
 
 
 def focus_email():
-    email_input.focus()
+    user_input.focus()
 
 
 def focus_password():
@@ -61,13 +65,13 @@ def focus_password():
 
 
 app = App(title="Gerenciador MEPOUPE", bg='#EDE7DF', width='400', height='250')
-block_window(app)
+app.tk.resizable(0,0)
 ghost_box_1 = Box(app, width='fill', height=75)
 box_info = Box(app, layout='grid')
-email_text = Text(box_info, text="Email:", grid=[0, 0], size=15, font='Times')
-email_text.when_clicked = focus_email
-email_input = TextBox(box_info, grid=[1, 0], width='fill')
-email_input.bg = 'white'
+user_text = Text(box_info, text="Usuário:", grid=[0, 0], size=15, font='Times')
+user_text.when_clicked = focus_email
+user_input = TextBox(box_info, grid=[1, 0], width='fill')
+user_input.bg = 'white'
 pwd_text = Text(box_info, text="Senha:", grid=[0, 1], size=15, font='Times')
 pwd_text.when_clicked = focus_password
 pwd_input = TextBox(box_info, hide_text=True, grid=[1, 1], width='fill')
