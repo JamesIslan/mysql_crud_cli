@@ -127,21 +127,12 @@ class TableCliente(DataBase):
     table_name = 'cliente'
     table_fields = ['id_cliente', 'nome', 'email', 'sexo', 'telefone']
 
-    def __init__(self) -> None:
-        super().__init__()
-
 
 class TableProduto(DataBase):
     table_name = 'produto'
     table_fields = ['id_produto', 'nome_produto', 'preco']
 
-    def __init__(self) -> None:
-        pass
-
 
 class TableUsuario(DataBase):
     table_name = 'usuario'
     table_fields = ['idusuario', 'usuario', 'senha']
-
-    def __init__(self) -> None:
-        pass
