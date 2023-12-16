@@ -35,11 +35,12 @@ def display_db_response(raw_response: tuple | list) -> None:
 
 def main() -> None:
     load_dotenv()
-    db = DataBase(
+    DataBase.connect(
         host=getenv("HOST", ""),
         user=getenv("USER", ""),
         password=getenv("PASSWORD", ""),
-        db_name=getenv("DB_NAME", ""))
+        db_name=getenv("DB_NAME", "")
+    )
     while True:
         show_options()
         desired_option = input('Opção Desejada: ')
