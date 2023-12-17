@@ -108,7 +108,7 @@ def focus_password():
     pwd_input.focus()
 
 
-app = App(title="Gerenciador MEPOUPE", bg='#EDE7DF', width='400', height='250')
+app = App(title="Gerenciador Cliente", bg='#EDE7DF', width='400', height='250')
 app.tk.resizable(0,0)
 ghost_box_1 = Box(app, width='fill', height=75)
 box_info = Box(app, layout='grid')
