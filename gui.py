@@ -1,8 +1,5 @@
-from guizero import App, Text, TextBox, PushButton, Box, Picture, Window, ButtonGroup
+from guizero import App, Text, TextBox, PushButton, Box, Picture, Window, ButtonGroup, ListBox
 from crud import DataBase
-
-def check_options():
-    pass
 
 def add(window,name,email,sex,phone):
     connect = DataBase('localhost', 'root', '123', 'aula_conexao_bd')
@@ -12,6 +9,9 @@ def add(window,name,email,sex,phone):
     connect.close()
     window.destroy()
   
+def close_window():
+    window_search_result.hide()
+    options.show()
 
 def window_add():
     window = Window(app,width=300,height=250, layout='grid')
@@ -33,13 +33,34 @@ def edit():
     pass
 
 
-def search():
-    pass
+def search(window):
+    search_method = window.question('Método de busca', "Insira o nome dos registros que deseja buscar\nou"
+                    "deixe em branco para obter todos os registros.")
+    connect = DataBase('localhost', 'root', '123', 'aula_conexao_bd')
+    if search_method not in (None, ''):
+        rows = connect.read(fields='',table='cliente',where_field='nome',where_value=search_method)
+    else:
+        rows = connect.read(fields='',table='cliente')
+    if len(rows) == 0:
+        window.info("Info", "Sua busca não resultou em nenhum registro!")
+    else:
+        result_search = []
+        for reg in rows:
+            result_search.append(f'id_cliente: {reg[0]} | nome: {reg[1]} | email: {reg[2]} | sexo: {reg[3]} | telefone: {reg[4]}')
+        global window_search_result
+        window_search_result = Window(window,width=575, height=350, title='Resultados da busca')
+        window_search_result.bg ='#EDE7DF'
+        box = Box(window_search_result, width='fill')
+        listbox = ListBox(box,items=result_search,scrollbar=True, width=550, height=350)
+        listbox.bg='white'
+        window_search_result.when_closed = close_window
+        window_search_result.tk.resizable(0,0)
+        window.hide()
+        window_search_result.show()
 
 
 def remove():
     pass
-
 
 def show_password():
     if pwd_show.image == 'img/senha_nao_visivel.png/':
@@ -60,13 +81,16 @@ def submit():
         data_input = (user_input.value, pwd_input.value)
         connect.close()
         if data_input in rows:
-            options = Window(app, width=400, height=400, layout='grid', bg='#EDE7DF',)
+            global options
+            options = Window(app, width=450, height=400, bg='#EDE7DF',)
+            options.when_closed = app.destroy
+            box_options = Box(options,layout='grid')
             options.tk.resizable(0, 0)
-            ghost_box = Box(options, grid=[0, 0], width=65)
-            button_add = PushButton(options, text="Adicionar", command=window_add, grid=[1, 0])
-            button_edit = PushButton(options, text="Editar", command=edit, grid=[2, 0])
-            button_search = PushButton(options, text="Buscar", command=search, grid=[3, 0])
-            button_remove = PushButton(options, text="Excluir", command=remove, grid=[4, 0])
+            ghost_box = Box(box_options, grid=[0, 0], width=10)
+            button_add = PushButton(box_options, text="Adicionar", command=window_add, grid=[1, 0])
+            button_edit = PushButton(box_options, text="Editar", command=edit, grid=[2, 0])
+            button_search = PushButton(box_options, text="Buscar", command=search, grid=[3, 0], args=[options])
+            button_remove = PushButton(box_options, text="Excluir", command=remove, grid=[4, 0])
             button_add.bg = button_edit.bg = button_remove.bg = button_search.bg ='white'
             app.hide()
             options.show()
