@@ -9,9 +9,16 @@ def add(window,name,email,sex,phone):
     connect.close()
     window.destroy()
   
-def close_window():
+def close_window_search():
     window_search_result.hide()
     options.show()
+
+def remove(connection, reg):
+    registry_remove = eval(reg.value)
+    connection.delete('cliente','id_cliente', registry_remove['id_cliente'])
+    connection.close()
+    close_window_search()
+
 
 def window_add():
     window = Window(app,width=300,height=250, layout='grid')
@@ -34,7 +41,7 @@ def edit():
 
 
 def search(window):
-    search_method = window.question('Método de busca', "Insira o nome dos registros que deseja buscar\nou"
+    search_method = window.question('Método de busca', "Insira o nome dos registros que deseja buscar\nou "
                     "deixe em branco para obter todos os registros.")
     connect = DataBase('localhost', 'root', '123', 'aula_conexao_bd')
     if search_method not in (None, ''):
@@ -46,21 +53,25 @@ def search(window):
     else:
         result_search = []
         for reg in rows:
-            result_search.append(f'id_cliente: {reg[0]} | nome: {reg[1]} | email: {reg[2]} | sexo: {reg[3]} | telefone: {reg[4]}')
+            result_search.append({'id_cliente': reg[0] ,'nome': reg[1] ,'email': reg[2] ,'sexo': reg[3] ,'telefone': reg[4]})
         global window_search_result
-        window_search_result = Window(window,width=575, height=350, title='Resultados da busca')
+        window_search_result = Window(window,width=580, height=345, title='Resultados da busca')
         window_search_result.bg ='#EDE7DF'
         box = Box(window_search_result, width='fill')
-        listbox = ListBox(box,items=result_search,scrollbar=True, width=550, height=350)
+        listbox = ListBox(box,items=result_search,scrollbar=True, width=550, height=250)
+        ghost_box = Box(window_search_result,width='fill', height=50)
+        box_options = Box(window_search_result,width='fill', height=50,layout='grid')
+        ghost_box_options = Box(box_options, grid=[0, 0], width=250)
+        button_edit = PushButton(box_options, text="Editar", command=edit,grid=[1,0])
+        button_remove = PushButton(box_options, text="Excluir", command=remove, grid=[2, 0], args=[connect,listbox])
+        button_edit.bg = button_remove.bg = "#CB9888"
+        button_edit.font = button_remove.font =  "Calibri"
         listbox.bg='white'
-        window_search_result.when_closed = close_window
+        window_search_result.when_closed = close_window_search
         window_search_result.tk.resizable(0,0)
         window.hide()
         window_search_result.show()
 
-
-def remove():
-    pass
 
 def show_password():
     if pwd_show.image == 'img/senha_nao_visivel.png/':
@@ -82,16 +93,16 @@ def submit():
         connect.close()
         if data_input in rows:
             global options
-            options = Window(app, width=450, height=400, bg='#EDE7DF',)
+            options = Window(app, width=400, height=250, bg='#EDE7DF',)
             options.when_closed = app.destroy
             box_options = Box(options,layout='grid')
             options.tk.resizable(0, 0)
             ghost_box = Box(box_options, grid=[0, 0], width=10)
             button_add = PushButton(box_options, text="Adicionar", command=window_add, grid=[1, 0])
-            button_edit = PushButton(box_options, text="Editar", command=edit, grid=[2, 0])
-            button_search = PushButton(box_options, text="Buscar", command=search, grid=[3, 0], args=[options])
-            button_remove = PushButton(box_options, text="Excluir", command=remove, grid=[4, 0])
-            button_add.bg = button_edit.bg = button_remove.bg = button_search.bg ='white'
+            #button_edit = PushButton(box_options, text="Editar", command=edit, grid=[2, 0])
+            button_search = PushButton(box_options, text="Buscar", command=search, grid=[2, 0], args=[options])
+            #button_remove = PushButton(box_options, text="Excluir", command=remove, grid=[4, 0])
+            button_add.bg = button_search.bg ='white'
             app.hide()
             options.show()
         else:
