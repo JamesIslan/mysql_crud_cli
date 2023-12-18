@@ -136,3 +136,12 @@ class TableProduto(DataBase):
 class TableUsuario(DataBase):
     table_name = 'usuario'
     table_fields = ['idusuario', 'usuario', 'senha']
+
+    def check_login(self, user_value: str, password_value: str) -> bool:
+        query = (
+            f'SELECT * FROM {self.table_name} '
+            f'WHERE {self.table_fields[1]} = "{user_value}" AND {self.table_fields[2]} = "{password_value}" '
+        )
+        DataBase.__cursor.execute(query)
+        response = self.__cursor.fetchone()
+        return bool(response)
