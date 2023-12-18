@@ -99,9 +99,7 @@ def submit():
             options.tk.resizable(0, 0)
             ghost_box = Box(box_options, grid=[0, 0], width=10)
             button_add = PushButton(box_options, text="Adicionar", command=window_add, grid=[1, 0])
-            #button_edit = PushButton(box_options, text="Editar", command=edit, grid=[2, 0])
             button_search = PushButton(box_options, text="Buscar", command=search, grid=[2, 0], args=[options])
-            #button_remove = PushButton(box_options, text="Excluir", command=remove, grid=[4, 0])
             button_add.bg = button_search.bg ='white'
             app.hide()
             options.show()
