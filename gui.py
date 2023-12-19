@@ -31,7 +31,10 @@ def close_window_search():
     options.show()
 
 def remove(connection, reg):
-    registry_remove = eval(reg.value)
+    try:
+        registry_remove = eval(reg.value)
+    except TypeError:
+        return
     connection.delete('cliente','id_cliente', registry_remove['id_cliente'])
     connection.close()
     close_window_search()
@@ -59,7 +62,11 @@ def window_add():
 
 
 def window_edit(connect,reg):
-    reg_dict = eval(reg.value)
+    try:
+        reg_dict = eval(reg.value)
+    except TypeError:
+        return 
+    
     window = Window(app,width=400,height=250, layout='grid')
     window.bg = '#EDE7DF'
     text_name = Text(window, text='Nome:', grid=[0,0])
