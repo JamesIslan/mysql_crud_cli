@@ -8,32 +8,37 @@ Projeto de um CRUD feito com Python e MySQL, além de suportar interface gráfic
   <tbody>
     <tr>
       <td align="center" valign="top" width="33.33%">
-        <a href="https://github.com/JamesIslan"
-          ><img
+        <a href="https://github.com/JamesIslan">
+          <img
             src="https://avatars.githubusercontent.com/u/69359116?v=4"
             width="100px;"
-            alt="Sérgio"
-          /><br /><sub><b>Joamerson</b></sub></a
-        >
+            alt="Joamerson"
+          />
+        </a>
       </td>
       <td align="center" valign="top" width="33.33%">
-        <a href="https://github.com/kaiosilva13"
-          ><img
+        <a href="https://github.com/kaiosilva13">
+          <img
             src="https://avatars.githubusercontent.com/u/103119776?v=4"
             width="100px;"
             alt="Kaio"
-          /><br /><sub><b>Kaio</b></sub></a
-        >
+          />
+        </a>
       </td>
       <td align="center" valign="top" width="33.33%">
-        <a href="https://github.com/sergiodantasz"
-          ><img
+        <a href="https://github.com/sergiodantasz">
+          <img
             src="https://avatars.githubusercontent.com/u/95090310?v=4"
             width="100px;"
-            alt="Joamerson"
-          /><br /><sub><b>Sérgio</b></sub></a
-        >
+            alt="Sérgio"
+          />
+        </a>
       </td>
+    </tr>
+    <tr>
+      <td align="center">Joamerson</td>
+      <td align="center">Kaio</td>
+      <td align="center">Sérgio</td>
     </tr>
   </tbody>
 </table>
