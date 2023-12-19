@@ -73,7 +73,7 @@ def window_edit(connect,reg):
     phone= TextBox(window,grid=[3,2], width=20,text=reg_dict['telefone'])
     ghost_box_3 = Box(window,grid=[0,3], height=50)
     new_reg = [name,email,sex,phone]
-    button = PushButton(window,grid=[2,4],text="Cadastrar",command=edit,args=[window,connect,reg_dict,new_reg])
+    button = PushButton(window,grid=[2,4],text="Atualizar",command=edit,args=[window,connect,reg_dict,new_reg])
     text_name.font = sex_name.font = email.font = phone_text.font = button.font= 'Calibri'
     name.bg = email.bg = phone.bg = 'white'
     button.bg = '#CB9888'
