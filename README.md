@@ -24,9 +24,15 @@ Projeto de um CRUD feito com Python e MySQL, além de suportar interface gráfic
       </td>
     </tr>
     <tr>
-      <td align="center">Joamerson</td>
-      <td align="center">Kaio</td>
-      <td align="center">Sérgio</td>
+      <td align="center">
+        <a href="https://github.com/JamesIslan">Joamerson</a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/kaiosilva13">Kaio</a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/sergiodantasz">Sérgio</a>
+      </td>
     </tr>
   </tbody>
 </table>
