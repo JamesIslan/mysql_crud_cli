@@ -58,7 +58,7 @@ def window_add():
     input_name.bg = input_email.bg = phone_input.bg = 'white'
     button.bg = '#CB9888'
     window.tk.resizable(0,0)
-    window.show()
+    window.show(wait=True)
 
 
 def window_edit(connect,reg):
@@ -85,7 +85,7 @@ def window_edit(connect,reg):
     name.bg = email.bg = phone.bg = 'white'
     button.bg = '#CB9888'
     window.tk.resizable(0,0)
-    window.show()
+    window.show(wait=True)
 
     
 
